@@ -30,7 +30,7 @@ python app.py
 You can run your React app on [`localhost:4000`](http://localhost:4000) by running:
 
 ```sh
-npm start --prefix client
+  npm start --prefix client
 ```
 
 You are not being assessed on React, and you don't have to update any of the React
