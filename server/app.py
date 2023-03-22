@@ -57,7 +57,7 @@ def sweets():
 
 @app.route('/sweets/<int:id>', methods=['GET'])
 def sweet_by_id(id):
-    sweet = Sweet.query.filter(Vendor.id == id).first()
+    sweet = Sweet.query.filter(Sweet.id == id).first()
 
     if not sweet:
         response_dict = {"error": "Sweet not found"}
@@ -78,6 +78,7 @@ def sweet_by_id(id):
 @app.route('/vendor_sweets' , methods=['POST'])
 def vendor_sweets():
     request_json = request.get_json()
+
     new_vendor_sweet = VendorSweet(
         price=request_json.get('price'),
         vendor_id=request_json.get('vendor_id'),
@@ -86,18 +87,44 @@ def vendor_sweets():
     db.session.add(new_vendor_sweet)
     db.session.commit()
 
+    if not new_vendor_sweet:
+        response_dict = {"error": "Sweet not found"}
+
+        response = make_response(
+              jsonify(response_dict),
+            404)
+        return response
     # vendor=new_vendor_sweet.vendors
-    response = make_response(
-        jsonify(new_vendor_sweet.to_dict())
-        ,200)
+    else:
+        response = make_response(
+            jsonify(new_vendor_sweet.to_dict())
+            ,200)
 
     return response
 
 
 
-@app.route('/vendor_sweets/<int:id>')
+@app.route('/vendor_sweets/<int:id>', methods=['DELETE'])
 def vendor_sweet_by_id(id):
-    return ''
+    vendor_sweet = VendorSweet.query.filter(VendorSweet.id == id).first()
+    if not vendor_sweet:
+        response_dict = {"error": "VendorSweet not found"}
+
+        response = make_response(
+              jsonify(response_dict),
+            404)
+        return response
+
+    elif request.method == 'DELETE':
+        db.session.delete(vendor_sweet)
+        db.session.commit()
+
+        response = make_response(
+           jsonify({},200)
+        )
+
+        return response
+
 
 
 if __name__ == '__main__':
